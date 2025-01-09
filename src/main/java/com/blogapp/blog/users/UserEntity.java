@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
-@Entity
+@Entity(name = "users")
 @Getter
 @Setter
 @ToString

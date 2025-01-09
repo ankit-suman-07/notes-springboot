@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
 
 import java.util.Date;
 
-@Entity
+@Entity(name = "articles")
 @Getter
 @Setter
 @ToString
