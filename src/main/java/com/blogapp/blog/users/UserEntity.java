@@ -11,7 +11,9 @@ import java.util.Objects;
 @Entity(name = "users")
 @Getter
 @Setter
+@Builder
 @ToString
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class UserEntity {
     @Id

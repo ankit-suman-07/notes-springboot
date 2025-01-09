@@ -3,10 +3,7 @@ package com.blogapp.blog.coments;
 import com.blogapp.blog.articles.ArticleEntity;
 import com.blogapp.blog.users.UserEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -16,7 +13,9 @@ import java.util.Date;
 @Entity(name = "comments")
 @Getter
 @Setter
+@Builder
 @ToString
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class CommentEntity {
     @Id
