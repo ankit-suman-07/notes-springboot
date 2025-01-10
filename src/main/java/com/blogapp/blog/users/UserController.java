@@ -1,13 +1,13 @@
 package com.blogapp.blog.users;
 
+import com.blogapp.blog.common.dtos.ErrorResponse;
 import com.blogapp.blog.users.dtos.CreateUserRequest;
-import com.blogapp.blog.users.dtos.CreateUserResponse;
+import com.blogapp.blog.users.dtos.UserResponse;
+import com.blogapp.blog.users.dtos.LoginUserRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -23,14 +23,39 @@ public class UserController {
     }
 
     @PostMapping("")
-    ResponseEntity<CreateUserResponse> signUpUser(@RequestBody CreateUserRequest request) {
+    ResponseEntity<UserResponse> signUpUser(@RequestBody CreateUserRequest request) {
         UserEntity savedUser = usersService.createUser(request);
         URI savedUserUri = URI.create("/users/" + savedUser.getId());
-        return ResponseEntity.created(savedUserUri).body(modelMapper.map(savedUser, CreateUserResponse.class));
+        return ResponseEntity.created(savedUserUri).body(modelMapper.map(savedUser, UserResponse.class));
     }
 
     @PostMapping("/login")
-    void loginUser() {
+    ResponseEntity<UserResponse> loginUser(@RequestBody LoginUserRequest request) {
+        UserEntity savedUser = usersService.loginUser(request.getUsername(), request.getPassword());
 
+        return ResponseEntity.ok(modelMapper.map(savedUser, UserResponse.class));
+    }
+
+    @ExceptionHandler({
+            UsersService.UserNotFoundException.class
+    })
+
+    ResponseEntity<ErrorResponse> handleUserNotFound(Exception ex) {
+        String message;
+        HttpStatus status;
+
+        if(ex instanceof UsersService.UserNotFoundException) {
+            message = ex.getMessage();
+            status = HttpStatus.NOT_FOUND;
+        } else {
+            message = "Something went wrong!!!";
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        ErrorResponse response = ErrorResponse.builder()
+                .message(message)
+                .build();
+
+        return ResponseEntity.status(status).body(response);
     }
 }
