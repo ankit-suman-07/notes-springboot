@@ -49,4 +49,5 @@ public class UserEntity {
     public int hashCode() {
         return getClass().hashCode();
     }
+
 }
