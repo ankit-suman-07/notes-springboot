@@ -13,4 +13,6 @@ public class UserResponse {
     private String bio;
 
     private String image;
+
+    private String token;
 }

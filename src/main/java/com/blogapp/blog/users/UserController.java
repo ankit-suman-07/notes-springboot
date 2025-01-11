@@ -1,6 +1,7 @@
 package com.blogapp.blog.users;
 
 import com.blogapp.blog.common.dtos.ErrorResponse;
+import com.blogapp.blog.security.JWTService;
 import com.blogapp.blog.users.dtos.CreateUserRequest;
 import com.blogapp.blog.users.dtos.UserResponse;
 import com.blogapp.blog.users.dtos.LoginUserRequest;
@@ -16,24 +17,31 @@ import java.net.URI;
 public class UserController {
     private final UsersService usersService;
     private final ModelMapper modelMapper;
+    private final JWTService jwtService;
 
-    public UserController(UsersService usersService, ModelMapper modelMapper) {
+    public UserController(UsersService usersService, ModelMapper modelMapper, JWTService jwtService) {
         this.usersService = usersService;
         this.modelMapper = modelMapper;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("")
     ResponseEntity<UserResponse> signUpUser(@RequestBody CreateUserRequest request) {
         UserEntity savedUser = usersService.createUser(request);
         URI savedUserUri = URI.create("/users/" + savedUser.getId());
-        return ResponseEntity.created(savedUserUri).body(modelMapper.map(savedUser, UserResponse.class));
+        var savedUserResponse = modelMapper.map(savedUser, UserResponse.class);
+        savedUserResponse.setToken(jwtService.createJwt(savedUser.getId()));
+        return ResponseEntity.created(savedUserUri).body(savedUserResponse);
     }
 
     @PostMapping("/login")
     ResponseEntity<UserResponse> loginUser(@RequestBody LoginUserRequest request) {
         UserEntity savedUser = usersService.loginUser(request.getUsername(), request.getPassword());
 
-        return ResponseEntity.ok(modelMapper.map(savedUser, UserResponse.class));
+        var userResponse = modelMapper.map(savedUser, UserResponse.class);
+        userResponse.setToken(jwtService.createJwt(savedUser.getId()));
+
+        return ResponseEntity.ok(userResponse);
     }
 
     @ExceptionHandler({
